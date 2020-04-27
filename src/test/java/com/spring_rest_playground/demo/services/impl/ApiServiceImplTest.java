@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest
 public class ApiServiceImplTest {
 
+    private static final int LIMIT = 3;
     @Autowired
     ApiService apiService;
 
@@ -28,8 +29,8 @@ public class ApiServiceImplTest {
     @Test
     public void testGetUsers() throws Exception {
 
-        List<User> users = apiService.getUsers(3);
+        List<User> users = apiService.getUsers(LIMIT);
 
-        assertEquals(4, users.size());
+        assertEquals(LIMIT, users.size());
     }
 }
