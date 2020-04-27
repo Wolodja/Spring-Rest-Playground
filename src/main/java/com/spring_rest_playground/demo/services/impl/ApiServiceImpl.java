@@ -14,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class ApiServiceImpl implements  ApiService {
@@ -53,12 +54,12 @@ public class ApiServiceImpl implements  ApiService {
     }
 
     private User createUsers() {
-        Faker faker = new Faker();
+        Faker faker = new Faker(new Locale("pl"));
         User user = new User();
         user.setName(Name.builder().first(faker.name().firstName()).last(faker.name().lastName()).build());
         user.setCurrency(faker.code().asin());
         user.setEmail(faker.internet().emailAddress());
-        user.setGender(faker.options().option("Male", "Female"));
+        user.setGender(faker.options().option("Kobieta", "Mężczyzna"));
         user.setLanguage(faker.address().countryCode());
         user.setPhone(faker.phoneNumber().cellPhone());
         user.setJob(Job.builder().company(faker.company().name()).build());
