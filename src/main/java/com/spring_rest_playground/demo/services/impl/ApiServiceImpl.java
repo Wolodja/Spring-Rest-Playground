@@ -1,13 +1,16 @@
 package com.spring_rest_playground.demo.services.impl;
 
+import com.github.javafaker.Faker;
 import com.spring_rest_playground.demo.api.domain.Job;
 import com.spring_rest_playground.demo.api.domain.Name;
 import com.spring_rest_playground.demo.api.domain.User;
 import com.spring_rest_playground.demo.api.domain.UserData;
 import com.spring_rest_playground.demo.services.ApiService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +20,21 @@ public class ApiServiceImpl implements  ApiService {
 
     private RestTemplate restTemplate;
 
-    public ApiServiceImpl(RestTemplate restTemplate) {
+    private final String apiUri;
+
+    public ApiServiceImpl(RestTemplate restTemplate, @Value("${api.url}") String apiUri) {
         this.restTemplate = restTemplate;
+        this.apiUri = apiUri;
     }
 
     @Override
     public List<User> getUsers(Integer limit) {
+        UriComponentsBuilder builder = UriComponentsBuilder
+                .fromUriString(apiUri)
+                .queryParam("limit", limit);
         List<User> users;
         try {
-            users = restTemplate.getForObject("http://apifaketory.com/api/user?limit=" + limit, UserData.class).getData();
+            users = restTemplate.getForObject(builder.toUriString(), UserData.class).getData();
         } catch (ResourceAccessException resourceAccessException){
             users = populateUsers(limit);
         }
@@ -33,10 +42,10 @@ public class ApiServiceImpl implements  ApiService {
     }
 
     private List<User> populateUsers(Integer limit) {
-        User user = createUsers();
         int numberOfUsers = 0;
         List<User> users = new ArrayList<>();
         while (numberOfUsers < limit){
+            User user = createUsers();
             users.add(user);
             numberOfUsers++;
         }
@@ -44,14 +53,15 @@ public class ApiServiceImpl implements  ApiService {
     }
 
     private User createUsers() {
+        Faker faker = new Faker();
         User user = new User();
-        user.setName(Name.builder().first("John").last("Smith").build());
-        user.setCurrency("PLN");
-        user.setEmail("email@mail.com");
-        user.setGender("Male");
-        user.setLanguage("Polish");
-        user.setPhone("324 654 154");
-        user.setJob(Job.builder().company("Google").title("Senior Java Developer").build());
+        user.setName(Name.builder().first(faker.name().firstName()).last(faker.name().lastName()).build());
+        user.setCurrency(faker.code().asin());
+        user.setEmail(faker.internet().emailAddress());
+        user.setGender(faker.options().option("Male", "Female"));
+        user.setLanguage(faker.address().countryCode());
+        user.setPhone(faker.phoneNumber().cellPhone());
+        user.setJob(Job.builder().company(faker.company().name()).build());
         return user;
 
     }
