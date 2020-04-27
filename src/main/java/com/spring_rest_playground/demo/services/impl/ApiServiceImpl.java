@@ -48,6 +48,9 @@ public class ApiServiceImpl implements  ApiService {
         user.setName(Name.builder().first("John").last("Smith").build());
         user.setCurrency("PLN");
         user.setEmail("email@mail.com");
+        user.setGender("Male");
+        user.setLanguage("Polish");
+        user.setPhone("324 654 154");
         user.setJob(Job.builder().company("Google").title("Senior Java Developer").build());
         return user;
 
